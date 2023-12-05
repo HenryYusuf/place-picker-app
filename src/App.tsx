@@ -4,7 +4,7 @@ import { useRef, useState, useEffect } from "react";
 // Import custom components and data
 import Places from "./components/Places.tsx";
 import { AVAILABLE_PLACES, AvailablePlacesState } from "./data.ts";
-import Modal, { ModalRef } from "./components/Modal.tsx";
+import Modal from "./components/Modal.tsx";
 import DeleteConfirmation from "./components/DeleteConfirmation.tsx";
 import logoImg from "./assets/logo.png";
 import { sortPlacesByDistance } from "./loc.ts";
@@ -21,10 +21,10 @@ const storedPlaces = storeIds
 
 function App() {
   // Create refs for modal and selected place
-  const modal = useRef<ModalRef>();
   const selectedPlace = useRef<string | undefined>();
 
   // State for available and picked places
+  const [modalIsOpen, setModalIsOpen] = useState(false);
   const [availablePlaces, setAvailablePlaces] = useState<
     AvailablePlacesState[]
   >([]);
@@ -48,13 +48,13 @@ function App() {
 
   // Open modal to confirm place removal
   function handleStartRemovePlace(id: string) {
-    modal.current!.open();
+    setModalIsOpen(true);
     selectedPlace.current = id;
   }
 
   // Close modal without removing the place
   function handleStopRemovePlace() {
-    modal.current!.close();
+    setModalIsOpen(false);
   }
 
   // Add selected place to the picked places and store in local storage
@@ -89,7 +89,7 @@ function App() {
     setPickedPlaces((prevPickedPlaces) =>
       prevPickedPlaces.filter((place) => place.id !== selectedPlace.current)
     );
-    modal.current!.close();
+    setModalIsOpen(false);
 
     // Update local storage after removing the place
     const storeIds = JSON.parse(
@@ -105,7 +105,7 @@ function App() {
   return (
     <>
       {/* Modal component for delete confirmation */}
-      <Modal ref={modal}>
+      <Modal open={modalIsOpen} onClose={handleStopRemovePlace}>
         <DeleteConfirmation
           onCancel={handleStopRemovePlace}
           onConfirm={handleRemovePlace}
