@@ -1,5 +1,5 @@
 // Import React hooks and components
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
 
 // Import custom components and data
 import Places from "./components/Places.tsx";
@@ -84,22 +84,25 @@ function App() {
     }
   }
 
-  // Remove the selected place from picked places and local storage
-  function handleRemovePlace() {
-    setPickedPlaces((prevPickedPlaces) =>
-      prevPickedPlaces.filter((place) => place.id !== selectedPlace.current)
-    );
-    setModalIsOpen(false);
+  const handleRemovePlace = useCallback(
+    // Remove the selected place from picked places and local storage
+    function handleRemovePlace() {
+      setPickedPlaces((prevPickedPlaces) =>
+        prevPickedPlaces.filter((place) => place.id !== selectedPlace.current)
+      );
+      setModalIsOpen(false);
 
-    // Update local storage after removing the place
-    const storeIds = JSON.parse(
-      localStorage.getItem("selectedPlaces") || "[]"
-    ) as string[];
-    localStorage.setItem(
-      "selectedPlaces",
-      JSON.stringify(storeIds.filter((id) => id !== selectedPlace.current))
-    );
-  }
+      // Update local storage after removing the place
+      const storeIds = JSON.parse(
+        localStorage.getItem("selectedPlaces") || "[]"
+      ) as string[];
+      localStorage.setItem(
+        "selectedPlaces",
+        JSON.stringify(storeIds.filter((id) => id !== selectedPlace.current))
+      );
+    },
+    []
+  );
 
   // Render the main app component
   return (
